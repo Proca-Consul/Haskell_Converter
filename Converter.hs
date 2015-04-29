@@ -3,11 +3,11 @@ import Data.List
 
 converterDec :: Int -> (String, String, String)
 converterDec n 
-		= ("Binary: " ++ bin, "Octal: " ++ oct, "Hexadecimal: " ++ hex)
-	where 
-		bin = show(binary n)
-		oct = show(octal n)
-		hex = fromBinToHex bin
+    = ("Binary: " ++ bin, "Octal: " ++ oct, "Hexadecimal: " ++ hex)
+  where 
+    bin = show(binary n)
+    oct = show(octal n)
+    hex = fromBinToHex bin
 
 converter :: Int -> (String, String, String)
 converter n = ("Binary: " ++ bin, "Octal: " ++ oct, "Hexadecimal: " ++ hex)
@@ -18,11 +18,11 @@ converter n = ("Binary: " ++ bin, "Octal: " ++ oct, "Hexadecimal: " ++ hex)
 
 converterBin :: Int -> (String, String, String)
 converterBin n 
-		= ("Decimal: " ++ dec, "Octal: " ++ oct, "Hexadecimal: " ++ hex)
-	where 
-		dec = show(fromBinToDec n)
-		oct = show(fromBinToOct n)
-		hex = fromBinToHex (show n)
+    = ("Decimal: " ++ dec, "Octal: " ++ oct, "Hexadecimal: " ++ hex)
+  where 
+    dec = show(fromBinToDec n)
+    oct = show(fromBinToOct n)
+    hex = fromBinToHex (show n)
 
 -- Basic Conversion: Binary/Octal/Hexadecimal -------------------
 
