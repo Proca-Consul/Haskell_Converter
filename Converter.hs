@@ -9,13 +9,6 @@ converterDec n
     oct = show(octal n)
     hex = fromBinToHex bin
 
-converter :: Int -> (String, String, String)
-converter n = ("Binary: " ++ bin, "Octal: " ++ oct, "Hexadecimal: " ++ hex)
-  where
-   bin = show(binary n)
-   oct = show(octal n)
-   hex = fromBinToHex bin
-
 converterBin :: Int -> (String, String, String)
 converterBin n 
     = ("Decimal: " ++ dec, "Octal: " ++ oct, "Hexadecimal: " ++ hex)
