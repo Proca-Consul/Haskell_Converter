@@ -5,8 +5,8 @@ converterDec :: Int -> (String, String, String)
 converterDec n 
     = ("Binary: " ++ bin, "Octal: " ++ oct, "Hexadecimal: " ++ hex)
   where 
-    bin = show(binary n)
-    oct = show(octal n)
+    bin = fromListToString(binary n)
+    oct = fromListToString(octal n)
     hex = fromBinToHex bin
 
 converterBin :: Int -> (String, String, String)
@@ -19,10 +19,10 @@ converterBin n
 
 -- Basic Conversion: Binary/Octal/Hexadecimal -------------------
 
-binary :: Int -> Int
+binary :: Int -> [Int]
 binary n = newbase n 2
 
-octal :: Int -> Int
+octal :: Int -> [Int]
 octal n = newbase n 8
 
 fromBinToHex :: String -> String
@@ -64,6 +64,11 @@ countDigits :: Int -> Int
 countDigits 0 = 0
 countDigits n = 1 + countDigits (n `div` 10)
 
+fromListToString :: [Int] -> String
+fromListToString []       = ""
+fromListToString (n : ns) = show(n) ++ fromListToString ns
+
+
 -- Adjust binary string to 4/3 digits format 
 
 make4 :: String -> String
@@ -78,10 +83,10 @@ make3 list
 
 -- Convert any decimal number to given base
 
-newbase :: Int -> Int -> Int 
-newbase n b 
-	| n < b     = n 
-	| otherwise = (newbase (n `div` b) b) * 10 + n `mod` b
+newbase :: Int -> Int -> [Int]
+newbase n b
+  | n < b = [n]
+  | otherwise = (newbase (n `div` b) b) ++ [n `mod` b]
 
 -- Hexadecimal - Binary Map--------------------------------------
 
