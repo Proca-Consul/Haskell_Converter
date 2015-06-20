@@ -1,6 +1,6 @@
 
 -- Copyright: Ivan Procaccini© 2015
--- To Prof. Wayne Luk, because "it's a bit when you are chilven,
+-- To Prof. Wayne Luk, because "it's a bit when you are childven,
 -- and you play wiph your toys: ah ah you control your toys
 -- but but but your parents... ahh they control you".
 
