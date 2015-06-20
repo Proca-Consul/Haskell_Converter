@@ -1,21 +1,27 @@
 
 import Data.List
+import Data.Char
 
-converterDec :: Int -> (String, String, String)
+converterDec :: Int -> String
 converterDec n 
-    = ("Binary: " ++ bin, "Octal: " ++ oct, "Hexadecimal: " ++ hex)
+    = "\n" ++ "Binary: " ++ bin ++ "\n" ++ "Octal: " ++ oct ++
+      "\n" ++  "Hexadecimal: " ++ hex ++ "\n"
   where 
     bin = fromListToString(binary n)
     oct = fromListToString(octal n)
     hex = fromBinToHex bin
 
-converterBin :: Int -> (String, String, String)
-converterBin n 
-    = ("Decimal: " ++ dec, "Octal: " ++ oct, "Hexadecimal: " ++ hex)
+converterBin :: (Num a, Show a) => a -> String
+converterBin n = converterB (show n)
+
+converterB :: String -> String
+converterB n 
+    = "\n" ++ "Decimal: " ++ dec ++ "\n" ++ "Octal: " ++ oct ++
+      "\n" ++  "Hexadecimal: " ++ hex ++ "\n"
   where 
     dec = show(fromBinToDec n)
     oct = show(fromBinToOct n)
-    hex = fromBinToHex (show n)
+    hex = fromBinToHex n
 
 -- Basic Conversion: Binary/Octal/Hexadecimal -------------------
 
@@ -31,23 +37,26 @@ fromBinToHex b  = lookUp hexMap fourDig ++ fromBinToHex rest
   where
    (fourDig, rest) = splitAt 4 (make4 b)
 
-fromBinToDec :: Int -> Int
-fromBinToDec 0 = 0
-fromBinToDec n = sum (zipWith (*) binList powOfTwo)
+fromBinToDec :: String -> Int
+fromBinToDec s
+  | not(elem '1' s) = 0 
+  | otherwise  = sum (zipWith (*) binList powOfTwo)
   where
-    binList  = toList n
+    binList  = toList s
     powOfTwo = reverse (map (2^) [0.. digits - 1])
-    digits   = countDigits n
+    digits   = length s
 
-fromBinToOct :: Int -> Int
+fromBinToOct :: String -> Int
 fromBinToOct b
-  | (length . toList) b <= 3 = fromBinToDec threeDig
+  | (length . toList) b <= 3 = toDec3
   | otherwise                
-       = fromBinToDec threeDig * 10^((length(make3(toList b)) `div` 3) - 1) + fromBinToOct rest
+       = toDec3 * 10^((length(make3(toList b)) `div` 3) - 1) + toDecT
   where
     (three, tail) = splitAt 3 (make3(toList b))
-    threeDig      = fromList three
-    rest          = fromList tail     
+    threeStr      = fromListToString three
+    tailStr       = fromListToString tail
+    toDec3        = fromBinToDec threeStr
+    toDecT        = fromBinToDec tailStr
 
 -- Helper functions ---------------------------------------------
 
@@ -55,14 +64,12 @@ fromList :: [Int] -> Int
 fromList []       = 0
 fromList (n : ns) = n * 10^(length ns) + fromList ns
 
-toList :: Int -> [Int]
-toList n
-  | countDigits n == 1 = [n]
-  | otherwise          = toList (n `div` 10) ++ [(n `mod` 10)]
-
-countDigits :: Int -> Int 
-countDigits 0 = 0
-countDigits n = 1 + countDigits (n `div` 10)
+toList :: String -> [Int]
+toList s
+  | length  s == 1 = [digitToInt (head s)]
+  | otherwise      = (digitToInt n) : toList ns
+  where 
+   (n : ns) = s
 
 fromListToString :: [Int] -> String
 fromListToString []       = ""
@@ -102,3 +109,40 @@ lookUp pairs key = head [ a | (a, b) <- pairs, b == key ]
 lookUpRev :: Eq a => [(a, a)] -> a -> a
 lookUpRev pairs key = head [ b | (a, b) <- pairs, a == key ]
 
+-- Main ---------------------------------------------------------
+
+converter :: IO ()
+converter = do
+  putStrLn ""
+  putStrLn "    #####################"
+  putStrLn "    #                   #"
+  putStrLn "    # HA∑KEΛΛ Converter #"
+  putStrLn "    #                   #"
+  putStrLn "    #####################"
+  putStrLn ""
+  putStrLn "> Instructions:"
+  putStrLn "> Type [1] for Dec -> (Bin, Oct, Hex) conversion"
+  putStrLn "> Type [2] for Bin -> (Dec, Oct, Hex) conversion"
+  putStrLn "> NOTE: The conversion is suitable for unsigned integers up to 2^63 - 1"
+  mode <- getLine
+  putStrLn "> Enter the number to convert:"
+  input <- getLine
+  putStrLn (conv mode input)
+  putStrLn "> Exiting. Bzzz..."
+  return ()
+  
+conv :: String -> String -> String
+conv mode input
+  | ((read mode :: Int) == 1) 
+      = converterDec (read input :: Int)
+  | (length input) > 63 
+      = "> Invalid Binary Number"
+  | filter (\ d -> d /= '1' && d /= '0') input /= [] 
+      = "> Invalid Binary Number"
+  | otherwise 
+      = converterB input
+  
+          
+
+  
+       
