@@ -129,8 +129,10 @@ converter = do
   putStrLn "> Type [1] for Dec -> (Bin, Oct, Hex) conversion"
   putStrLn "> Type [2] for Bin -> (Dec, Oct, Hex) conversion"
   putStrLn "> NOTE: The conversion is suitable for unsigned integers up to 2^63 - 1"
+  putStr "> "
   mode <- getLine
   putStrLn "> Enter the number to convert:"
+  putStr "> "
   input <- getLine
   putStrLn (conv mode input)
   putStrLn "> Exiting. Bzzz..."
@@ -138,6 +140,8 @@ converter = do
   
 conv :: String -> String -> String
 conv mode input
+  | not (all isDigit input) 
+      = "> Invalid input: input non-numeric"
   | ((read mode :: Int) == 1) 
       = converterDec (read input :: Int)
   | (length input) > 63 
@@ -147,7 +151,3 @@ conv mode input
   | otherwise 
       = converterB input
   
-          
-
-  
-       
