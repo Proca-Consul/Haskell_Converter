@@ -1,31 +1,30 @@
 
 -- Copyright: Ivan Procaccini© 2015
--- To Prof. Wayne Luk, because "it's a bit when you are childven,
+-- To W. L., because "it's a bit like when you are childven,
 -- and you play wiph your toys: ah ah you control your toys
--- but but but your parents... ahh they control you".
+-- but but but your parents... ahh, they control you".
 
 import Data.List
+import Data.List.Split
 import Data.Char
 
 converterDec :: Int -> String
 converterDec n 
-    = "\n" ++ "Binary: " ++ bin ++ "\n" ++ "Octal: " ++ oct ++
-      "\n" ++  "Hexadecimal: " ++ hex ++ "\n"
+  = "> " ++ "Binary: " ++ bin ++ "\n> " ++ "Octal: " ++ oct ++
+    "\n> " ++  "Hexadecimal: " ++ hex
   where 
     bin = fromListToString(binary n)
     oct = fromListToString(octal n)
     hex = fromBinToHex bin
 
-converterBin :: (Num a, Show a) => a -> String
-converterBin n = converterB (show n)
-
 converterB :: String -> String
 converterB n 
-    = "\n" ++ "Decimal: " ++ dec ++ "\n" ++ "Octal: " ++ oct ++
-      "\n" ++  "Hexadecimal: " ++ hex ++ "\n"
+  = "> " ++ "Decimal: " ++ dec ++ "\n> " ++ "Octal: " ++ oct ++
+    "\n> " ++  "Hexadecimal: " ++ hex
   where 
+    dec' = fromBinToDec n
     dec = show(fromBinToDec n)
-    oct = show(fromBinToOct n)
+    oct = fromListToString(octal dec')
     hex = fromBinToHex n
 
 -- Basic Conversion: Binary/Octal/Hexadecimal -------------------
@@ -125,29 +124,41 @@ converter = do
   putStrLn "    #                   #"
   putStrLn "    #####################"
   putStrLn ""
-  putStrLn "> Instructions:"
-  putStrLn "> Type [1] for Dec -> (Bin, Oct, Hex) conversion"
-  putStrLn "> Type [2] for Bin -> (Dec, Oct, Hex) conversion"
-  putStrLn "> NOTE: The conversion is suitable for unsigned integers up to 2^63 - 1"
-  putStr "> "
-  mode <- getLine
-  putStrLn "> Enter the number to convert:"
+  putStrLn "> NOTE: the conversion is only suitable for unsigned integers up to 2^63 - 1"
+  loop 
+
+loop :: IO()
+loop = do
+  putStrLn "> Enter command [quit | bin <Number> | dec <Number>]:"
   putStr "> "
   input <- getLine
-  putStrLn (conv mode input)
-  putStrLn "> Exiting. Bzzz..."
-  return ()
+  conv (head(splitOn " " input)) (head(tail(splitOn " " input)))   
+{-   where -}
+    {- mode = head((splitOn " " input))   -}
+    {- number = tail((splitOn " " input)) -}
+
+conv :: String -> String -> IO()
+conv "quit" _ = return()
+conv "bin" number = checkFromBin number 
+conv "dec" number = checkFromDec number
+conv _ _ = putStrLn "> Invalid command." >> loop
+
+checkFromDec :: String -> IO()
+checkFromDec number 
+  | not (all isDigit number) 
+      = putStrLn "> Invalid input: non-numeric." >> loop
+  | otherwise
+      = putStrLn (converterDec (read number :: Int)) >> loop 
+
+checkFromBin :: String -> IO()
+checkFromBin number 
+  | not (all isDigit number) 
+      = putStrLn "> Invalid input: non-numeric." >> loop
+  | filter (\ d -> d /= '1' && d /= '0') number /= [] || 
+    (length number) > 63 
+      = putStrLn "> Invalid Binary Number." >> loop
+  | otherwise
+      = putStrLn (converterB number) >> loop
+
   
-conv :: String -> String -> String
-conv mode input
-  | not (all isDigit input) 
-      = "> Invalid input: input non-numeric"
-  | ((read mode :: Int) == 1) 
-      = converterDec (read input :: Int)
-  | (length input) > 63 
-      = "> Invalid Binary Number"
-  | filter (\ d -> d /= '1' && d /= '0') input /= [] 
-      = "> Invalid Binary Number"
-  | otherwise 
-      = converterB input
-  
+
